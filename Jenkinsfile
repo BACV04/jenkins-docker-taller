@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/BACV04/jenkins-docker-taller.git' // Reemplaza si usas otro repo
+                git branch: 'main', url: 'https://github.com/BACV04/jenkins-docker-taller.git' // Reemplaza si usas otro repo
             }
         }
 
