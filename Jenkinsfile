@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'python -m venv venv && . venv/bin/activate && pip install -r requirements.txt'
+                        sh './venv/bin/pip install -r requirements.txt'
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         throw e
