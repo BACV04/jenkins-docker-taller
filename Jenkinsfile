@@ -18,7 +18,7 @@ pipeline {
             script {
               try {
                 // Crear entorno virtual
-                  sh 'python3 -m venv venv'
+                  sh 'python -m venv venv'
                 // Instalar dependencias
                   sh './venv/bin/pip install -r requirements.txt'
               } catch (Exception e) {
