@@ -15,34 +15,81 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'python -m venv venv && . venv/bin/activate && pip install -r requirements.txt'
+                script {
+                    try {
+                        sh 'python -m venv venv && . venv/bin/activate && pip install -r requirements.txt'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                sh '. venv/bin/activate && pytest'
+                script {
+                    try {
+                        sh '. venv/bin/activate && pytest'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                script {
+                    try {
+                        sh 'docker build -t $DOCKER_IMAGE .'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
             }
         }
 
         stage('Login to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "$DOCKERHUB_CREDENTIALS", usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-                    sh 'echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin'
+                script {
+                    try {
+                        withCredentials([usernamePassword(credentialsId: "$DOCKERHUB_CREDENTIALS", usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                            sh 'echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin'
+                        }
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
                 }
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                sh 'docker push $DOCKER_IMAGE'
+                script {
+                    try {
+                        sh 'docker push $DOCKER_IMAGE'
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
+                }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline completed"
+        }
+        success {
+            echo "Build and push to DockerHub was successful!"
+        }
+        failure {
+            echo "Build or push failed!"
         }
     }
 }
