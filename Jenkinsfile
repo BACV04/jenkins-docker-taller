@@ -14,16 +14,19 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-            steps {
-                script {
-                    try {
-                        sh './venv/bin/pip install -r requirements.txt'
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        throw e
-                    }
-                }
+          steps {
+            script {
+              try {
+                // Crear entorno virtual
+                  sh 'python3 -m venv venv'
+                // Instalar dependencias
+                  sh './venv/bin/pip install -r requirements.txt'
+              } catch (Exception e) {
+                currentBuild.result = 'FAILURE'
+                throw e
+              }
             }
+          }
         }
 
         stage('Run Unit Tests') {
